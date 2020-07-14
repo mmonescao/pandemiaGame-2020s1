@@ -1,5 +1,8 @@
 import wollok.game.*
 import simulacion.*
+import manzanas.*
+import personas.*
+import agenteDeSalud.*
 
 object pandemiaGameConfig {
 	method height() = 4
@@ -9,8 +12,23 @@ object pandemiaGameConfig {
 	method configureGame() {
 		self.configureGameParameters()
 		self.agregarManzanas()
-		// agregar las teclas de acciones
-		// después, al agente de salud y sus teclas de acciones y movimiento
+		game.addVisual(agenteDeSalud)
+		agenteDeSalud.position(2, 3)
+		keyboard.e().onPressDo ({game.say(agenteDeSalud, simulacion.reporte())})
+		keyboard.up().onPressDo ({agenteDeSalud.moveteArriba()})
+		keyboard.down().onPressDo ({agenteDeSalud.moveteAbajo()})
+		keyboard.left().onPressDo ({agenteDeSalud.moveteIzquierda()})
+		keyboard.right().onPressDo ({agenteDeSalud.moveteDerecha()})
+		keyboard.p().onPressDo ({simulacion.agregarCasoImportadoAlAzar()})
+		keyboard.a().onPressDo ({agenteDeSalud.aislarATodes()})
+		keyboard.c().onPressDo ({agenteDeSalud.convencerAManzanaDeRespetarCuarentena()})
+		keyboard.r().onPressDo ({game.say(agenteDeSalud, simulacion.reportarTotalDeGenteRecuperada())})
+		keyboard.t().onPressDo ({game.say(agenteDeSalud, simulacion.reportarTotalDePersonas())})
+		keyboard.i().onPressDo ({game.say(agenteDeSalud, simulacion.reportarTotalDeInfectados())})
+		keyboard.o().onPressDo ({game.say(agenteDeSalud, simulacion.reportarTotalDeGenteQueRespetaCuarentena())})
+		keyboard.u().onPressDo ({game.say(agenteDeSalud, simulacion.reportarTotalDeGenteAislada())})
+		keyboard.y().onPressDo ({game.say(agenteDeSalud, simulacion.reportarTotalDeGenteConSitomas())})
+		
 	}
 		
 	method configureGameParameters() {
@@ -33,7 +51,11 @@ object pandemiaGameConfig {
 }
 
 program pandemiaGame {
-	pandemiaGameConfig.configureGame()
-	game.start()
-}
+		pandemiaGameConfig.configureGame()
+		game.onTick(10000,"simular dia", {simulacion.simularUnDiaEnManzanas()})
+		game.onTick(10000,"avanzar dia", simulacion.avanzarDia())
+		game.onTick(10000,"informar dia", {game.say(agenteDeSalud, simulacion.informarDia())})
+	 
+		game.start()
+}	
 
